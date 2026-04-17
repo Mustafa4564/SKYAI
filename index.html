@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SkyAI – Intelligent Flight Price Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --sky: #0ea5e9;
+      --sky-dark: #0369a1;
+      --sky-light: #e0f2fe;
+      --accent: #f97316;
+      --accent-light: #fff7ed;
+      --green: #22c55e;
+      --red: #ef4444;
+      --dark: #0f172a;
+      --mid: #334155;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --bg: #f8fafc;
+      --card: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg); color: var(--dark); min-height: 100vh; }
+
+    /* NAV */
+    nav { background: var(--card); border-bottom: 1px solid var(--border); padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 60px; position: sticky; top:0; z-index:100; }
+    .nav-logo { font-size: 1.3rem; font-weight: 700; color: var(--sky-dark); display: flex; align-items: center; gap: 8px; }
+    .nav-logo span { color: var(--accent); }
+    nav ul { list-style: none; display: flex; gap: 1.5rem; }
+    nav a { text-decoration: none; color: var(--muted); font-size: 0.9rem; font-weight: 500; transition: color .2s; }
+    nav a:hover, nav a.active { color: var(--sky-dark); }
+
+    /* HERO */
+    .hero { background: linear-gradient(135deg, #0c4a6e 0%, #0369a1 50%, #0ea5e9 100%); color: white; padding: 4rem 2rem 3rem; text-align: center; position: relative; overflow: hidden; }
+    .hero::before { content:''; position:absolute; inset:0; background: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='30' r='1' fill='white' opacity='0.08'/%3E%3C/svg%3E"); }
+    .hero h1 { font-family: 'DM Serif Display', serif; font-size: clamp(2rem, 5vw, 3.2rem); margin-bottom: 1rem; position: relative; }
+    .hero p { font-size: 1.1rem; opacity: 0.85; max-width: 540px; margin: 0 auto 2rem; position: relative; }
+
+    /* SEARCH BOX */
+    .search-box { background: white; border-radius: 16px; padding: 1.5rem; max-width: 860px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr auto auto auto; gap: 12px; align-items: end; box-shadow: 0 20px 60px rgba(0,0,0,0.2); position: relative; }
+    .field label { font-size: 0.75rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; display: block; margin-bottom: 6px; }
+    .field input, .field select { width: 100%; border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 14px; font-family: inherit; font-size: 0.95rem; color: var(--dark); transition: border-color .2s; outline: none; }
+    .field input:focus, .field select:focus { border-color: var(--sky); }
+    .btn-search { background: var(--accent); color: white; border: none; border-radius: 10px; padding: 12px 24px; font-family: inherit; font-weight: 700; font-size: 1rem; cursor: pointer; white-space: nowrap; transition: background .2s, transform .1s; }
+    .btn-search:hover { background: #ea6c00; }
+    .btn-search:active { transform: scale(.97); }
+
+    /* CONTAINER */
+    .container { max-width: 1100px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+
+    /* STATS ROW */
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 2.5rem; }
+    .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.2rem 1.5rem; }
+    .stat-card .label { font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 6px; }
+    .stat-card .value { font-size: 1.8rem; font-weight: 700; color: var(--dark); }
+    .stat-card .sub { font-size: 0.82rem; color: var(--green); margin-top: 2px; font-weight: 500; }
+
+    /* RESULTS GRID */
+    .results-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.2rem; }
+    .results-header h2 { font-size: 1.2rem; font-weight: 700; }
+    .sort-btn { background: none; border: 1.5px solid var(--border); border-radius: 8px; padding: 6px 14px; font-family: inherit; font-size: 0.85rem; color: var(--mid); cursor: pointer; transition: all .2s; }
+    .sort-btn:hover { border-color: var(--sky); color: var(--sky-dark); }
+    .sort-btn.active { background: var(--sky-light); border-color: var(--sky); color: var(--sky-dark); }
+
+    .flight-grid { display: flex; flex-direction: column; gap: 14px; }
+    .flight-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.2rem 1.5rem; display: grid; grid-template-columns: 1fr auto 1fr auto; align-items: center; gap: 1.5rem; cursor: pointer; transition: box-shadow .2s, border-color .2s; position: relative; }
+    .flight-card:hover { box-shadow: 0 4px 24px rgba(14,165,233,.12); border-color: var(--sky); }
+    .flight-card.best { border-color: var(--green); }
+    .best-badge { position: absolute; top: -10px; left: 20px; background: var(--green); color: white; font-size: 0.72rem; font-weight: 700; padding: 3px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: .05em; }
+    .ai-badge { position: absolute; top: -10px; right: 80px; background: var(--accent); color: white; font-size: 0.72rem; font-weight: 700; padding: 3px 12px; border-radius: 20px; }
+
+    .airline { display: flex; align-items: center; gap: 10px; }
+    .airline-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+    .airline-name { font-weight: 600; font-size: 0.95rem; }
+    .airline-code { font-size: 0.78rem; color: var(--muted); }
+
+    .route { text-align: center; }
+    .times { display: flex; align-items: center; gap: 8px; justify-content: center; }
+    .time { font-size: 1.25rem; font-weight: 700; }
+    .route-line { flex: 1; height: 2px; background: var(--border); position: relative; min-width: 60px; }
+    .route-line::after { content: '✈'; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); font-size: 14px; color: var(--sky); }
+    .duration { font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
+    .stops { font-size: 0.78rem; color: var(--accent); font-weight: 600; }
+
+    .details { font-size: 0.82rem; color: var(--muted); text-align: center; }
+    .details span { display: block; }
+
+    .price-col { text-align: right; }
+    .price { font-size: 1.7rem; font-weight: 700; color: var(--dark); }
+    .price-trend { font-size: 0.8rem; margin-top: 2px; font-weight: 600; }
+    .trend-up { color: var(--red); }
+    .trend-down { color: var(--green); }
+    .btn-book { display: block; background: var(--sky); color: white; border: none; border-radius: 8px; padding: 8px 20px; font-family: inherit; font-weight: 600; font-size: 0.85rem; cursor: pointer; margin-top: 8px; transition: background .2s; text-decoration: none; text-align: center; }
+    .btn-book:hover { background: var(--sky-dark); }
+
+    /* PRICE CHART */
+    .chart-section { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; margin-bottom: 2rem; }
+    .chart-section h3 { font-size: 1rem; font-weight: 700; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 8px; }
+    .chart-section h3::before { content: '📈'; font-size: 1rem; }
+    .chart-wrap { position: relative; height: 180px; }
+    canvas { width: 100% !important; height: 180px !important; }
+
+    /* AI INSIGHT */
+    .ai-insight { background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); border: 1.5px solid #fed7aa; border-radius: 14px; padding: 1.2rem 1.5rem; margin-bottom: 2rem; display: flex; gap: 14px; align-items: flex-start; }
+    .ai-icon { font-size: 1.8rem; flex-shrink: 0; }
+    .ai-insight h4 { font-weight: 700; color: #9a3412; margin-bottom: 4px; }
+    .ai-insight p { font-size: 0.88rem; color: #7c2d12; line-height: 1.5; }
+
+    /* FOOTER */
+    footer { background: var(--dark); color: rgba(255,255,255,.5); text-align: center; padding: 1.5rem; font-size: 0.82rem; margin-top: 3rem; }
+    footer strong { color: white; }
+
+    @media (max-width: 700px) {
+      .search-box { grid-template-columns: 1fr 1fr; }
+      .btn-search { grid-column: 1/-1; }
+      .flight-card { grid-template-columns: 1fr 1fr; gap: 1rem; }
+      .stats { grid-template-columns: 1fr 1fr; }
+    }
+
+    .tag { display: inline-block; background: var(--sky-light); color: var(--sky-dark); font-size: 0.72rem; font-weight: 700; border-radius: 20px; padding: 3px 10px; margin-top: 4px; }
+
+    .loading { text-align: center; padding: 3rem; color: var(--muted); display: none; }
+    .loading.show { display: block; }
+    .spinner { display: inline-block; width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--sky); border-radius: 50%; animation: spin .7s linear infinite; margin-bottom: 12px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #results-section { display: none; }
+    #results-section.show { display: block; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">Sky<span>AI</span></div>
+  <ul>
+    <li><a href="index.html" class="active">Search</a></li>
+    <li><a href="tracker.html">Price Tracker</a></li>
+    <li><a href="predict.html">AI Predict</a></li>
+  </ul>
+</nav>
+
+<div class="hero">
+  <h1>Find Your Smartest Flight</h1>
+  <p>AI-powered price comparison, real-time tracking, and smart booking predictions.</p>
+  <div class="search-box">
+    <div class="field">
+      <label>From</label>
+      <input type="text" id="from" placeholder="Mumbai (BOM)" value="Mumbai (BOM)">
+    </div>
+    <div class="field">
+      <label>To</label>
+      <input type="text" id="to" placeholder="Delhi (DEL)" value="Delhi (DEL)">
+    </div>
+    <div class="field">
+      <label>Depart</label>
+      <input type="date" id="depart">
+    </div>
+    <div class="field">
+      <label>Passengers</label>
+      <select id="pax">
+        <option>1 Adult</option>
+        <option>2 Adults</option>
+        <option>3 Adults</option>
+      </select>
+    </div>
+    <button class="btn-search" onclick="searchFlights()">Search →</button>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <p>AI is scanning 50+ airlines and finding the best deals…</p>
+  </div>
+
+  <div id="results-section">
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat-card">
+        <div class="label">Flights Found</div>
+        <div class="value" id="stat-count">24</div>
+        <div class="sub">↑ across 8 airlines</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Best Price</div>
+        <div class="value" id="stat-best">₹3,450</div>
+        <div class="sub">↓ 12% vs last week</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">AI Recommendation</div>
+        <div class="value" style="font-size:1.1rem; margin-top:4px;">Book Today</div>
+        <div class="sub">Prices rising soon</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Avg. Price</div>
+        <div class="value" id="stat-avg">₹5,210</div>
+        <div class="sub">₹1,760 you can save</div>
+      </div>
+    </div>
+
+    <!-- AI Insight -->
+    <div class="ai-insight">
+      <div class="ai-icon">🤖</div>
+      <div>
+        <h4>AI Insight – Book Now</h4>
+        <p>Based on historical trends and current demand patterns, prices for <strong>Mumbai → Delhi</strong> are predicted to rise by <strong>18–24%</strong> over the next 5 days due to upcoming holiday demand. The IndiGo 6E-201 at ₹3,450 is currently <strong>31% below average</strong>. Best time to book: <em>within the next 6 hours.</em></p>
+      </div>
+    </div>
+
+    <!-- Price Chart -->
+    <div class="chart-section">
+      <h3>Price Trend – Last 30 Days</h3>
+      <div class="chart-wrap">
+        <canvas id="priceChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Sort -->
+    <div class="results-header">
+      <h2>Available Flights</h2>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="sort-btn active" onclick="sortBy('price',this)">Cheapest</button>
+        <button class="sort-btn" onclick="sortBy('duration',this)">Fastest</button>
+        <button class="sort-btn" onclick="sortBy('ai',this)">AI Score</button>
+      </div>
+    </div>
+
+    <div class="flight-grid" id="flight-grid"></div>
+  </div>
+
+</div>
+
+<footer><strong>SkyAI</strong> · AI-Based Flight Price Comparison & Recommendation Platform · Built as a Technology Commercialization Prototype</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="js/app.js"></script>
+<script>
+  // Set today's date
+  const d = new Date(); d.setDate(d.getDate()+7);
+  document.getElementById('depart').value = d.toISOString().split('T')[0];
+</script>
+</body>
+</html>

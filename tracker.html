@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SkyAI – Price Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+  <style>
+    :root { --sky:#0ea5e9; --sky-dark:#0369a1; --sky-light:#e0f2fe; --accent:#f97316; --green:#22c55e; --red:#ef4444; --dark:#0f172a; --mid:#334155; --muted:#64748b; --border:#e2e8f0; --bg:#f8fafc; --card:#ffffff; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:'Space Grotesk',sans-serif; background:var(--bg); color:var(--dark); }
+    nav { background:var(--card); border-bottom:1px solid var(--border); padding:0 2rem; display:flex; align-items:center; justify-content:space-between; height:60px; position:sticky; top:0; z-index:100; }
+    .nav-logo { font-size:1.3rem; font-weight:700; color:var(--sky-dark); }
+    .nav-logo span { color:var(--accent); }
+    nav ul { list-style:none; display:flex; gap:1.5rem; }
+    nav a { text-decoration:none; color:var(--muted); font-size:0.9rem; font-weight:500; transition:color .2s; }
+    nav a:hover, nav a.active { color:var(--sky-dark); }
+    .page-header { background:linear-gradient(135deg,#0c4a6e,#0369a1); color:white; padding:2.5rem 2rem; }
+    .page-header h1 { font-family:'DM Serif Display',serif; font-size:2rem; margin-bottom:6px; }
+    .page-header p { opacity:.8; font-size:.95rem; }
+    .container { max-width:1000px; margin:0 auto; padding:2rem 1.5rem; }
+
+    .tracker-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:2rem; }
+    .tracker-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:1.5rem; }
+    .tracker-card h3 { font-size:1rem; font-weight:700; margin-bottom:1rem; }
+
+    .add-alert { display:flex; gap:10px; margin-bottom:1.5rem; }
+    .add-alert input { flex:1; border:1.5px solid var(--border); border-radius:10px; padding:10px 14px; font-family:inherit; font-size:.9rem; }
+    .add-alert input:focus { border-color:var(--sky); outline:none; }
+    .btn-add { background:var(--sky); color:white; border:none; border-radius:10px; padding:10px 18px; font-family:inherit; font-weight:600; font-size:.9rem; cursor:pointer; }
+    .btn-add:hover { background:var(--sky-dark); }
+
+    .alert-item { display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--border); }
+    .alert-item:last-child { border:none; }
+    .alert-route { font-weight:600; font-size:.92rem; }
+    .alert-target { font-size:.82rem; color:var(--muted); }
+    .badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:.72rem; font-weight:700; }
+    .badge-active { background:#dcfce7; color:#15803d; }
+    .badge-triggered { background:#fef3c7; color:#b45309; }
+    .btn-del { background:none; border:none; color:var(--red); cursor:pointer; font-size:1rem; }
+
+    .history-item { display:flex; align-items:center; gap:14px; padding:10px 0; border-bottom:1px solid var(--border); }
+    .history-item:last-child { border:none; }
+    .history-icon { font-size:1.3rem; }
+    .history-route { font-weight:600; font-size:.88rem; }
+    .history-date { font-size:.78rem; color:var(--muted); }
+    .history-price { font-weight:700; color:var(--dark); margin-left:auto; }
+
+    .chart-section { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:1.5rem; margin-bottom:2rem; }
+    .chart-section h3 { font-size:1rem; font-weight:700; margin-bottom:1rem; }
+    canvas { height:220px!important; }
+
+    .notify-box { background:#f0fdf4; border:1.5px solid #86efac; border-radius:14px; padding:1.2rem 1.5rem; display:flex; gap:14px; align-items:flex-start; }
+    .notify-box h4 { font-weight:700; color:#15803d; margin-bottom:4px; }
+    .notify-box p { font-size:.85rem; color:#166534; line-height:1.5; }
+
+    @media(max-width:650px) { .tracker-grid { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+<nav>
+  <div class="nav-logo">Sky<span>AI</span></div>
+  <ul>
+    <li><a href="index.html">Search</a></li>
+    <li><a href="tracker.html" class="active">Price Tracker</a></li>
+    <li><a href="predict.html">AI Predict</a></li>
+  </ul>
+</nav>
+
+<div class="page-header">
+  <h1>Price Tracker & Alerts</h1>
+  <p>Set your target price. SkyAI watches 24/7 and alerts you the moment prices drop.</p>
+</div>
+
+<div class="container">
+  <div class="notify-box" style="margin-bottom:2rem;">
+    <div style="font-size:1.8rem;">🔔</div>
+    <div>
+      <h4>Alert Triggered! Mumbai → Delhi dropped to ₹3,450</h4>
+      <p>Your target was ₹4,000. This is <strong>13.75% below</strong> your target price. IndiGo 6E-201 on 24 Apr — Book now before prices rise again!</p>
+    </div>
+  </div>
+
+  <div class="chart-section">
+    <h3>📊 Price History – Mumbai → Delhi (Last 60 Days)</h3>
+    <canvas id="histChart"></canvas>
+  </div>
+
+  <div class="tracker-grid">
+    <div class="tracker-card">
+      <h3>🎯 Active Price Alerts</h3>
+      <div class="add-alert">
+        <input type="text" id="newRoute" placeholder="e.g. BOM → DEL under ₹4000" />
+        <button class="btn-add" onclick="addAlert()">+ Add</button>
+      </div>
+      <div id="alerts-list">
+        <div class="alert-item">
+          <div>
+            <div class="alert-route">Mumbai → Delhi</div>
+            <div class="alert-target">Target: under ₹4,000</div>
+          </div>
+          <span class="badge badge-triggered">⚡ Triggered</span>
+          <button class="btn-del" onclick="this.parentElement.remove()">✕</button>
+        </div>
+        <div class="alert-item">
+          <div>
+            <div class="alert-route">Delhi → Bangalore</div>
+            <div class="alert-target">Target: under ₹5,500</div>
+          </div>
+          <span class="badge badge-active">● Active</span>
+          <button class="btn-del" onclick="this.parentElement.remove()">✕</button>
+        </div>
+        <div class="alert-item">
+          <div>
+            <div class="alert-route">Mumbai → Chennai</div>
+            <div class="alert-target">Target: under ₹3,800</div>
+          </div>
+          <span class="badge badge-active">● Active</span>
+          <button class="btn-del" onclick="this.parentElement.remove()">✕</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="tracker-card">
+      <h3>🕐 Recently Tracked</h3>
+      <div class="history-item">
+        <div class="history-icon">✈️</div>
+        <div>
+          <div class="history-route">Mumbai → Delhi</div>
+          <div class="history-date">Today, 9:32 AM</div>
+        </div>
+        <div class="history-price" style="color:var(--green)">₹3,450 ↓</div>
+      </div>
+      <div class="history-item">
+        <div class="history-icon">✈️</div>
+        <div>
+          <div class="history-route">Delhi → Bangalore</div>
+          <div class="history-date">Yesterday</div>
+        </div>
+        <div class="history-price">₹5,890</div>
+      </div>
+      <div class="history-item">
+        <div class="history-icon">✈️</div>
+        <div>
+          <div class="history-route">Pune → Hyderabad</div>
+          <div class="history-date">2 days ago</div>
+        </div>
+        <div class="history-price" style="color:var(--red)">₹4,200 ↑</div>
+      </div>
+      <div class="history-item">
+        <div class="history-icon">✈️</div>
+        <div>
+          <div class="history-route">Mumbai → Kolkata</div>
+          <div class="history-date">3 days ago</div>
+        </div>
+        <div class="history-price">₹6,100</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+function addAlert() {
+  const input = document.getElementById('newRoute');
+  if (!input.value.trim()) return;
+  const list = document.getElementById('alerts-list');
+  const item = document.createElement('div');
+  item.className = 'alert-item';
+  item.innerHTML = `<div><div class="alert-route">${input.value}</div><div class="alert-target">Tracking now…</div></div><span class="badge badge-active">● Active</span><button class="btn-del" onclick="this.parentElement.remove()">✕</button>`;
+  list.appendChild(item);
+  input.value = '';
+}
+
+// History Chart
+const labels = [];
+const prices = [];
+for (let i = 59; i >= 0; i--) {
+  const d = new Date(); d.setDate(d.getDate()-i);
+  labels.push(d.toLocaleDateString('en-IN',{day:'numeric',month:'short'}));
+  prices.push(Math.round(5200 + Math.sin(i*0.3)*800 + Math.random()*500 - 250));
+}
+prices[55] = 3450; prices[56] = 3600; prices[57] = 3700; prices[58] = 3820; prices[59] = 3450;
+
+new Chart(document.getElementById('histChart'), {
+  type:'line',
+  data: {
+    labels,
+    datasets: [{
+      label:'Price ₹',
+      data: prices,
+      borderColor:'#0ea5e9',
+      backgroundColor:'rgba(14,165,233,.07)',
+      fill:true, tension:0.4, pointRadius:1, borderWidth:2
+    }, {
+      label:'Your Target',
+      data: Array(60).fill(4000),
+      borderColor:'#f97316',
+      borderDash:[6,4], borderWidth:1.5, pointRadius:0, fill:false
+    }]
+  },
+  options: {
+    responsive:true, maintainAspectRatio:false,
+    plugins: { tooltip:{ callbacks:{ label: c => '₹'+c.parsed.y.toLocaleString() } } },
+    scales: { y:{ ticks:{ callback: v=>'₹'+v.toLocaleString() }, grid:{color:'#f1f5f9'} }, x:{ ticks:{maxTicksLimit:8}, grid:{display:false} } }
+  }
+});
+</script>
+</body>
+</html>

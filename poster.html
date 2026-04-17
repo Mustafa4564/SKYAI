@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SkyAI – Research Poster</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  @page { size: A1 portrait; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: #f0f7ff;
+    width: 594mm;
+    min-height: 841mm;
+    margin: 0 auto;
+    color: #0f172a;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  /* HEADER BAND */
+  .header {
+    background: linear-gradient(135deg, #0c4a6e 0%, #0369a1 45%, #0ea5e9 100%);
+    color: white;
+    padding: 28px 40px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    right: -60px; top: -60px;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.07);
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    right: 60px; bottom: -80px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.05);
+  }
+  .header-inner { position: relative; z-index: 1; }
+  .logo-row { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
+  .logo { background: white; color: #0369a1; font-weight: 900; font-size: 1.5rem; padding: 8px 18px; border-radius: 12px; letter-spacing: -0.5px; }
+  .logo span { color: #f97316; }
+  .category { background: rgba(255,255,255,.2); color: white; font-size: .7rem; font-weight: 700; padding: 4px 14px; border-radius: 20px; letter-spacing: .08em; text-transform: uppercase; }
+  .header h1 { font-family: 'Playfair Display', serif; font-size: 2.4rem; line-height: 1.15; margin-bottom: 8px; }
+  .header h1 em { font-style: normal; color: #fbbf24; }
+  .subtitle { font-size: .95rem; opacity: .85; max-width: 75%; line-height: 1.5; }
+  .header-meta { display: flex; gap: 28px; margin-top: 14px; }
+  .meta-item { font-size: .78rem; opacity: .8; }
+  .meta-item strong { display: block; font-size: .7rem; text-transform: uppercase; letter-spacing: .06em; opacity: .7; }
+
+  /* MAIN GRID */
+  .poster-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: auto auto auto auto;
+    gap: 14px;
+    padding: 18px 20px;
+  }
+
+  /* CARDS */
+  .card {
+    background: white;
+    border-radius: 16px;
+    padding: 18px 20px;
+    border: 1px solid #e0efff;
+    box-shadow: 0 2px 12px rgba(14,165,233,.06);
+  }
+  .card h2 {
+    font-size: .72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: #0369a1;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e0f2fe;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .card h2 .icon { font-size: 1rem; }
+
+  /* SPAN UTILITIES */
+  .col-span-2 { grid-column: span 2; }
+  .col-span-3 { grid-column: span 3; }
+
+  /* PROBLEM STATEMENT */
+  .problem-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .prob-item { background: #fff1f2; border: 1.5px solid #fecdd3; border-radius: 12px; padding: 12px 14px; text-align: center; }
+  .prob-item .picon { font-size: 1.6rem; margin-bottom: 6px; }
+  .prob-item .ptitle { font-size: .8rem; font-weight: 800; color: #be123c; margin-bottom: 4px; }
+  .prob-item .pdesc { font-size: .72rem; color: #9f1239; line-height: 1.4; }
+  .stat-big { font-size: 2rem; font-weight: 900; color: #be123c; display: block; }
+
+  /* SOLUTION FLOW */
+  .flow-row { display: flex; align-items: center; gap: 8px; }
+  .flow-step { flex: 1; background: #f0f9ff; border: 1.5px solid #bae6fd; border-radius: 12px; padding: 12px 10px; text-align: center; }
+  .flow-step .ficon { font-size: 1.5rem; margin-bottom: 4px; }
+  .flow-step .ftitle { font-size: .78rem; font-weight: 800; color: #0369a1; margin-bottom: 3px; }
+  .flow-step .fdesc { font-size: .68rem; color: #0c4a6e; line-height: 1.35; }
+  .flow-arrow { font-size: 1.2rem; color: #0ea5e9; flex-shrink: 0; }
+
+  /* ARCHITECTURE */
+  .arch-layers { display: flex; flex-direction: column; gap: 8px; }
+  .arch-layer { border-radius: 10px; padding: 10px 14px; }
+  .arch-layer .layer-title { font-size: .72rem; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+  .arch-layer .layer-items { display: flex; gap: 6px; flex-wrap: wrap; }
+  .layer-chip { font-size: .68rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+  .l-user { background: #ede9fe; border: 1px solid #c4b5fd; }
+  .l-user .layer-title { color: #6d28d9; }
+  .l-user .layer-chip { background: #ddd6fe; color: #5b21b6; }
+  .l-ai { background: #ecfdf5; border: 1px solid #a7f3d0; }
+  .l-ai .layer-title { color: #065f46; }
+  .l-ai .layer-chip { background: #d1fae5; color: #064e3b; }
+  .l-data { background: #fff7ed; border: 1px solid #fcd34d; }
+  .l-data .layer-title { color: #92400e; }
+  .l-data .layer-chip { background: #fef3c7; color: #78350f; }
+  .l-infra { background: #f0f9ff; border: 1px solid #7dd3fc; }
+  .l-infra .layer-title { color: #0c4a6e; }
+  .l-infra .layer-chip { background: #e0f2fe; color: #0369a1; }
+
+  /* INNOVATION */
+  .innovation-list { display: flex; flex-direction: column; gap: 10px; }
+  .innov-item { display: flex; gap: 12px; align-items: flex-start; }
+  .innov-num { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #0369a1, #0ea5e9); color: white; font-weight: 900; font-size: .85rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+  .innov-title { font-size: .82rem; font-weight: 800; color: #0c4a6e; margin-bottom: 2px; }
+  .innov-desc { font-size: .72rem; color: #334155; line-height: 1.4; }
+
+  /* COMMERCIALIZATION */
+  .revenue-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .rev-item { border-radius: 10px; padding: 12px; text-align: center; }
+  .rev-item .ricon { font-size: 1.4rem; margin-bottom: 4px; }
+  .rev-item .rtitle { font-size: .75rem; font-weight: 800; margin-bottom: 3px; }
+  .rev-item .rdesc { font-size: .68rem; line-height: 1.35; }
+  .rev-item.r1 { background: #fff7ed; border: 1px solid #fed7aa; color: #92400e; }
+  .rev-item.r2 { background: #f0fdf4; border: 1px solid #bbf7d0; color: #14532d; }
+  .rev-item.r3 { background: #ede9fe; border: 1px solid #c4b5fd; color: #4c1d95; }
+  .rev-item.r4 { background: #fef3c7; border: 1px solid #fde68a; color: #78350f; }
+
+  /* MARKET POTENTIAL */
+  .market-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .mstat { background: linear-gradient(135deg, #0369a1, #0ea5e9); color: white; border-radius: 12px; padding: 14px; text-align: center; }
+  .mstat .mval { font-size: 1.8rem; font-weight: 900; }
+  .mstat .mlabel { font-size: .7rem; opacity: .85; margin-top: 2px; }
+
+  /* USE CASE */
+  .usecase-steps { display: flex; flex-direction: column; gap: 8px; }
+  .uc-step { display: flex; align-items: flex-start; gap: 10px; padding: 8px 12px; background: #f8fafc; border-radius: 10px; border-left: 3px solid #0ea5e9; }
+  .uc-num { font-size: .75rem; font-weight: 900; color: #0369a1; min-width: 18px; }
+  .uc-text { font-size: .75rem; color: #334155; line-height: 1.4; }
+  .uc-text strong { color: #0c4a6e; }
+
+  /* CONCLUSION */
+  .conclusion-card {
+    background: linear-gradient(135deg, #0c4a6e 0%, #0369a1 50%, #0ea5e9 100%);
+    color: white;
+    border-radius: 16px;
+    padding: 18px 24px;
+    grid-column: span 3;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+  .conclusion-card .conc-icon { font-size: 3rem; flex-shrink: 0; }
+  .conclusion-card h3 { font-family: 'Playfair Display', serif; font-size: 1.3rem; margin-bottom: 6px; }
+  .conclusion-card p { font-size: .82rem; opacity: .9; line-height: 1.6; }
+  .tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  .tag { background: rgba(255,255,255,.2); font-size: .68rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+
+  /* PRICE CHART AREA */
+  .chart-container { width: 100%; height: 140px; position: relative; }
+  .chart-svg { width: 100%; height: 140px; }
+
+  /* PRINT BUTTON */
+  .print-btn {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    background: #0ea5e9; color: white;
+    border: none; border-radius: 12px;
+    padding: 12px 24px; font-size: 1rem;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700; cursor: pointer;
+    box-shadow: 0 4px 20px rgba(14,165,233,.4);
+    z-index: 999;
+  }
+  @media print { .print-btn { display: none; } body { width: 100%; } }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <div class="logo-row">
+      <div class="logo">Sky<span>AI</span></div>
+      <div class="category">Technology Commercialization · Startup Prospect</div>
+    </div>
+    <h1>AI-Based Intelligent Flight Price<br><em>Comparison, Tracker & Recommendation</em> Platform</h1>
+    <div class="subtitle">A smart travel technology startup that uses artificial intelligence to help travelers find, track, and predict the best flight prices — saving time, money, and decision fatigue.</div>
+    <div class="header-meta">
+      <div class="meta-item"><strong>Domain</strong>Travel Technology (TravelTech)</div>
+      <div class="meta-item"><strong>Technology</strong>AI / ML · Cloud · Real-time APIs</div>
+      <div class="meta-item"><strong>Model</strong>SaaS + Affiliate + Subscription</div>
+      <div class="meta-item"><strong>Target Market</strong>150M+ Indian Air Travelers</div>
+    </div>
+  </div>
+</div>
+
+<!-- POSTER BODY -->
+<div class="poster-body">
+
+  <!-- PROBLEM STATEMENT (span 2) -->
+  <div class="card col-span-2">
+    <h2><span class="icon">⚠️</span> Problem Statement</h2>
+    <div class="problem-grid">
+      <div class="prob-item">
+        <div class="picon">⏱️</div>
+        <span class="stat-big">3+ hrs</span>
+        <div class="ptitle">Time Wasted</div>
+        <div class="pdesc">Travelers manually check 5–10 websites to compare prices before booking</div>
+      </div>
+      <div class="prob-item">
+        <div class="picon">💸</div>
+        <span class="stat-big">₹1,800+</span>
+        <div class="ptitle">Average Overpayment</div>
+        <div class="pdesc">Passengers overpay per ticket due to poor price intelligence & wrong booking timing</div>
+      </div>
+      <div class="prob-item">
+        <div class="picon">😰</div>
+        <span class="stat-big">72%</span>
+        <div class="ptitle">Decision Stress</div>
+        <div class="pdesc">Travelers feel unsure whether to book now or wait, causing decision paralysis</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MARKET SIZE (span 1) -->
+  <div class="card">
+    <h2><span class="icon">🌍</span> Market Potential</h2>
+    <div class="market-stats">
+      <div class="mstat">
+        <div class="mval">$183B</div>
+        <div class="mlabel">Global Online Travel Market</div>
+      </div>
+      <div class="mstat">
+        <div class="mval">150M+</div>
+        <div class="mlabel">Indian Air Passengers/Year</div>
+      </div>
+      <div class="mstat">
+        <div class="mval">28%</div>
+        <div class="mlabel">Annual Growth Rate India</div>
+      </div>
+      <div class="mstat">
+        <div class="mval">₹890Cr</div>
+        <div class="mlabel">Addressable Market (India)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SOLUTION FLOW (span 3) -->
+  <div class="card col-span-3">
+    <h2><span class="icon">💡</span> Proposed Solution – How SkyAI Works</h2>
+    <div class="flow-row">
+      <div class="flow-step">
+        <div class="ficon">🧑‍💻</div>
+        <div class="ftitle">Traveler Inputs</div>
+        <div class="fdesc">User enters source, destination, travel date & budget</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="ficon">🌐</div>
+        <div class="ftitle">Real-Time Data Fetch</div>
+        <div class="fdesc">System queries 50+ airlines & OTAs via live APIs</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="ficon">🤖</div>
+        <div class="ftitle">AI Analysis</div>
+        <div class="fdesc">ML engine analyzes prices, trends, demand signals & user preferences</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="ficon">📈</div>
+        <div class="ftitle">Price Prediction</div>
+        <div class="fdesc">Predicts 7-day price trend: will it rise, fall, or stay stable?</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="ficon">🎯</div>
+        <div class="ftitle">Smart Recommendation</div>
+        <div class="fdesc">Suggests best flight & optimal booking time: BUY / WAIT / AVOID</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="ficon">🔔</div>
+        <div class="ftitle">Price Alerts</div>
+        <div class="fdesc">Sends instant notification when target price is reached</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INNOVATION -->
+  <div class="card">
+    <h2><span class="icon">🚀</span> Innovation Highlights</h2>
+    <div class="innovation-list">
+      <div class="innov-item">
+        <div class="innov-num">1</div>
+        <div>
+          <div class="innov-title">AI Price Prediction Engine</div>
+          <div class="innov-desc">Trained on 180+ days of historical fare data with 87% accuracy — predicts rises/falls before they happen</div>
+        </div>
+      </div>
+      <div class="innov-item">
+        <div class="innov-num">2</div>
+        <div>
+          <div class="innov-title">AI Flight Scoring (0–100)</div>
+          <div class="innov-desc">Ranks flights by value score combining price, baggage, seat comfort, layover time, and reliability</div>
+        </div>
+      </div>
+      <div class="innov-item">
+        <div class="innov-num">3</div>
+        <div>
+          <div class="innov-title">Smart Price Alerts</div>
+          <div class="innov-desc">Users set target price; AI monitors 24/7 and sends real-time alerts at the precise moment to book</div>
+        </div>
+      </div>
+      <div class="innov-item">
+        <div class="innov-num">4</div>
+        <div>
+          <div class="innov-title">BUY / WAIT / AVOID Signal</div>
+          <div class="innov-desc">Simple, actionable decision support based on demand signals, holidays, and historical booking patterns</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SYSTEM ARCHITECTURE -->
+  <div class="card">
+    <h2><span class="icon">🏗️</span> System Architecture</h2>
+    <div class="arch-layers">
+      <div class="arch-layer l-user">
+        <div class="layer-title">Presentation Layer (Frontend)</div>
+        <div class="layer-items">
+          <span class="layer-chip">Web App</span>
+          <span class="layer-chip">Mobile App</span>
+          <span class="layer-chip">Price Dashboard</span>
+          <span class="layer-chip">Alert UI</span>
+        </div>
+      </div>
+      <div class="arch-layer l-ai">
+        <div class="layer-title">AI & Logic Layer (Backend)</div>
+        <div class="layer-items">
+          <span class="layer-chip">ML Price Predictor</span>
+          <span class="layer-chip">Recommendation Engine</span>
+          <span class="layer-chip">Alert Manager</span>
+          <span class="layer-chip">Scoring API</span>
+        </div>
+      </div>
+      <div class="arch-layer l-data">
+        <div class="layer-title">Data Layer</div>
+        <div class="layer-items">
+          <span class="layer-chip">Flight API (Amadeus)</span>
+          <span class="layer-chip">Historical Price DB</span>
+          <span class="layer-chip">User Preferences</span>
+        </div>
+      </div>
+      <div class="arch-layer l-infra">
+        <div class="layer-title">Infrastructure</div>
+        <div class="layer-items">
+          <span class="layer-chip">AWS / GCP Cloud</span>
+          <span class="layer-chip">Redis Cache</span>
+          <span class="layer-chip">PostgreSQL</span>
+          <span class="layer-chip">REST API</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMMERCIALIZATION -->
+  <div class="card">
+    <h2><span class="icon">💰</span> Commercialization Potential</h2>
+    <div class="revenue-grid">
+      <div class="rev-item r1">
+        <div class="ricon">🤝</div>
+        <div class="rtitle">Affiliate Commission</div>
+        <div class="rdesc">3–5% per booking redirected to airlines & OTAs<br><strong>Est. ₹180Cr/yr</strong></div>
+      </div>
+      <div class="rev-item r2">
+        <div class="ricon">⭐</div>
+        <div class="rtitle">Premium Subscription</div>
+        <div class="rdesc">₹199/month for advanced AI predictions & priority alerts<br><strong>SaaS Revenue</strong></div>
+      </div>
+      <div class="rev-item r3">
+        <div class="ricon">📡</div>
+        <div class="rtitle">B2B API Licensing</div>
+        <div class="rdesc">License prediction engine to OTAs, travel agencies & corporates</div>
+      </div>
+      <div class="rev-item r4">
+        <div class="ricon">📢</div>
+        <div class="rtitle">Targeted Ads</div>
+        <div class="rdesc">Travel-intent users are high-value for airlines, hotels & insurance ads</div>
+      </div>
+    </div>
+    <div style="margin-top:12px; padding:10px 14px; background:#f0fdf4; border-radius:10px; border:1px solid #bbf7d0;">
+      <div style="font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:#065f46; margin-bottom:4px;">Startup Scalability</div>
+      <div style="font-size:.75rem; color:#14532d; line-height:1.5;">Low infrastructure cost · Global expansion ready · Existing players (Google Flights, Kayak) validate demand · AI differentiator creates defensible moat</div>
+    </div>
+  </div>
+
+  <!-- PRICE TREND VISUALIZATION -->
+  <div class="card col-span-2">
+    <h2><span class="icon">📊</span> Price Trend Visualization – AI Prediction Model</h2>
+    <div class="chart-container">
+      <svg class="chart-svg" viewBox="0 0 560 140" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="grad1" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#0ea5e9" stop-opacity="0.2"/>
+            <stop offset="100%" stop-color="#0ea5e9" stop-opacity="0"/>
+          </linearGradient>
+          <linearGradient id="grad2" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#f97316" stop-opacity="0.15"/>
+            <stop offset="100%" stop-color="#f97316" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <!-- Y gridlines -->
+        <line x1="40" y1="20" x2="540" y2="20" stroke="#e0efff" stroke-width="1"/>
+        <line x1="40" y1="50" x2="540" y2="50" stroke="#e0efff" stroke-width="1"/>
+        <line x1="40" y1="80" x2="540" y2="80" stroke="#e0efff" stroke-width="1"/>
+        <line x1="40" y1="110" x2="540" y2="110" stroke="#e0efff" stroke-width="1"/>
+        <!-- Y labels -->
+        <text x="36" y="23" font-size="9" fill="#64748b" text-anchor="end" font-family="Nunito, sans-serif">₹7k</text>
+        <text x="36" y="53" font-size="9" fill="#64748b" text-anchor="end" font-family="Nunito, sans-serif">₹5.5k</text>
+        <text x="36" y="83" font-size="9" fill="#64748b" text-anchor="end" font-family="Nunito, sans-serif">₹4k</text>
+        <text x="36" y="113" font-size="9" fill="#64748b" text-anchor="end" font-family="Nunito, sans-serif">₹2.5k</text>
+        <!-- Historical line (actual) -->
+        <path d="M40,90 C60,85 80,70 100,75 C120,80 140,60 160,65 C180,70 200,80 220,72 C240,64 260,50 280,55 C300,60 320,68 340,62 C360,56 380,45 400,48" fill="none" stroke="#0ea5e9" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M40,90 C60,85 80,70 100,75 C120,80 140,60 160,65 C180,70 200,80 220,72 C240,64 260,50 280,55 C300,60 320,68 340,62 C360,56 380,45 400,48 L400,130 L40,130 Z" fill="url(#grad1)"/>
+        <!-- Predicted line (dashed) -->
+        <path d="M400,48 C420,42 440,35 460,30 C480,25 500,22 520,18" fill="none" stroke="#f97316" stroke-width="2.5" stroke-dasharray="6,4" stroke-linecap="round"/>
+        <path d="M400,48 C420,42 440,35 460,30 C480,25 500,22 520,18 L520,130 L400,130 Z" fill="url(#grad2)"/>
+        <!-- Divider (today) -->
+        <line x1="400" y1="15" x2="400" y2="120" stroke="#0f172a" stroke-width="1" stroke-dasharray="3,3"/>
+        <text x="400" y="130" font-size="8" fill="#0f172a" text-anchor="middle" font-weight="700" font-family="Nunito, sans-serif">TODAY</text>
+        <!-- "Book Now" marker -->
+        <circle cx="400" cy="48" r="6" fill="#22c55e"/>
+        <text x="408" y="38" font-size="8" fill="#14532d" font-weight="800" font-family="Nunito, sans-serif">📍 BOOK NOW</text>
+        <!-- Legend -->
+        <line x1="44" y1="10" x2="70" y2="10" stroke="#0ea5e9" stroke-width="2.5"/>
+        <text x="74" y="13" font-size="8" fill="#0369a1" font-family="Nunito, sans-serif" font-weight="700">Historical Price</text>
+        <line x1="150" y1="10" x2="176" y2="10" stroke="#f97316" stroke-width="2.5" stroke-dasharray="5,3"/>
+        <text x="180" y="13" font-size="8" fill="#ea580c" font-family="Nunito, sans-serif" font-weight="700">AI Predicted (rising)</text>
+        <!-- X labels -->
+        <text x="40" y="128" font-size="8" fill="#94a3b8" text-anchor="middle" font-family="Nunito, sans-serif">30d ago</text>
+        <text x="220" y="128" font-size="8" fill="#94a3b8" text-anchor="middle" font-family="Nunito, sans-serif">15d ago</text>
+        <text x="520" y="128" font-size="8" fill="#94a3b8" text-anchor="middle" font-family="Nunito, sans-serif">+7d</text>
+      </svg>
+    </div>
+    <div style="font-size:.7rem; color:#64748b; text-align:center; margin-top:4px;">Sample: Mumbai → Delhi · Prices predicted to rise 18–24% over next 7 days based on holiday demand</div>
+  </div>
+
+  <!-- USE CASE -->
+  <div class="card">
+    <h2><span class="icon">👤</span> Use Case Scenario</h2>
+    <div class="usecase-steps">
+      <div class="uc-step">
+        <div class="uc-num">1</div>
+        <div class="uc-text"><strong>Traveler</strong> wants to fly Mumbai → Delhi on Apr 24 with budget ₹4,000</div>
+      </div>
+      <div class="uc-step">
+        <div class="uc-num">2</div>
+        <div class="uc-text">Opens SkyAI, enters details — system scans <strong>50+ airlines instantly</strong></div>
+      </div>
+      <div class="uc-step">
+        <div class="uc-num">3</div>
+        <div class="uc-text">AI finds IndiGo 6E-201 at <strong>₹3,450</strong> — 31% below market average</div>
+      </div>
+      <div class="uc-step">
+        <div class="uc-num">4</div>
+        <div class="uc-text">Prediction: price will <strong>rise 22% in 5 days</strong> due to IPL + holiday demand</div>
+      </div>
+      <div class="uc-step">
+        <div class="uc-num">5</div>
+        <div class="uc-text">SkyAI signals: <strong style="color:#15803d;">✓ BUY NOW</strong> — traveler saves ₹1,370 vs waiting</div>
+      </div>
+    </div>
+    <div style="margin-top:10px; background:#dcfce7; border-radius:8px; padding:8px 12px; font-size:.75rem; color:#14532d; font-weight:700;">
+      💚 Outcome: Time saved, money saved, stress-free booking decision
+    </div>
+  </div>
+
+  <!-- CONCLUSION -->
+  <div class="conclusion-card">
+    <div class="conc-icon">🏆</div>
+    <div>
+      <h3>Conclusion – A Commercially Viable AI Travel Startup</h3>
+      <p>SkyAI demonstrates that technology commercialization is achievable by applying AI to a real, widespread consumer problem. With a scalable SaaS model, affiliate revenues, and global market potential, this platform represents a high-opportunity startup in the booming travel-tech industry. The AI-driven approach — predicting prices before they change — creates a genuine competitive moat that existing aggregators lack.</p>
+      <div class="tags">
+        <span class="tag">AI / Machine Learning</span>
+        <span class="tag">Cloud-Native</span>
+        <span class="tag">High Scalability</span>
+        <span class="tag">₹180Cr+ Revenue Potential</span>
+        <span class="tag">Global Market</span>
+        <span class="tag">Startup Ready</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<button class="print-btn" onclick="window.print()">🖨️ Print / Save as PDF</button>
+
+</body>
+</html>

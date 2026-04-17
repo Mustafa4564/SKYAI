@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SkyAI – AI Price Prediction</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+  <style>
+    :root { --sky:#0ea5e9; --sky-dark:#0369a1; --sky-light:#e0f2fe; --accent:#f97316; --green:#22c55e; --red:#ef4444; --dark:#0f172a; --mid:#334155; --muted:#64748b; --border:#e2e8f0; --bg:#f8fafc; --card:#ffffff; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:'Space Grotesk',sans-serif; background:var(--bg); color:var(--dark); }
+    nav { background:var(--card); border-bottom:1px solid var(--border); padding:0 2rem; display:flex; align-items:center; justify-content:space-between; height:60px; position:sticky; top:0; z-index:100; }
+    .nav-logo { font-size:1.3rem; font-weight:700; color:var(--sky-dark); }
+    .nav-logo span { color:var(--accent); }
+    nav ul { list-style:none; display:flex; gap:1.5rem; }
+    nav a { text-decoration:none; color:var(--muted); font-size:0.9rem; font-weight:500; }
+    nav a:hover, nav a.active { color:var(--sky-dark); }
+    .page-header { background:linear-gradient(135deg,#1e1b4b,#312e81,#4338ca); color:white; padding:2.5rem 2rem; }
+    .page-header h1 { font-family:'DM Serif Display',serif; font-size:2rem; margin-bottom:6px; }
+    .page-header p { opacity:.8; font-size:.95rem; }
+    .container { max-width:1000px; margin:0 auto; padding:2rem 1.5rem; }
+
+    .predict-form { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:1.5rem; margin-bottom:2rem; display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:12px; align-items:end; }
+    .field label { font-size:.75rem; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); display:block; margin-bottom:6px; }
+    .field input, .field select { width:100%; border:1.5px solid var(--border); border-radius:10px; padding:10px 14px; font-family:inherit; font-size:.9rem; }
+    .field input:focus, .field select:focus { border-color:var(--sky); outline:none; }
+    .btn-predict { background:linear-gradient(135deg,#4338ca,#0ea5e9); color:white; border:none; border-radius:10px; padding:12px 20px; font-family:inherit; font-weight:700; font-size:.95rem; cursor:pointer; white-space:nowrap; }
+
+    .prediction-result { background:var(--card); border:1px solid var(--border); border-radius:14px; overflow:hidden; margin-bottom:2rem; }
+    .pred-header { background:linear-gradient(135deg,#312e81,#4338ca); color:white; padding:1.5rem; display:flex; align-items:center; justify-content:space-between; }
+    .pred-header h3 { font-size:1.2rem; font-weight:700; }
+    .pred-confidence { background:rgba(255,255,255,.2); border-radius:20px; padding:4px 14px; font-size:.8rem; font-weight:600; }
+    .pred-body { padding:1.5rem; }
+    .pred-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:1.5rem; }
+    .pred-stat { text-align:center; }
+    .pred-stat .label { font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin-bottom:4px; }
+    .pred-stat .val { font-size:1.5rem; font-weight:700; }
+
+    .timeline { display:flex; flex-direction:column; gap:10px; }
+    .tl-item { display:flex; align-items:center; gap:14px; padding:12px 14px; border-radius:10px; background:var(--bg); border:1px solid var(--border); }
+    .tl-day { font-weight:600; font-size:.85rem; width:80px; flex-shrink:0; }
+    .tl-bar-wrap { flex:1; background:#e2e8f0; border-radius:6px; height:10px; overflow:hidden; }
+    .tl-bar { height:100%; border-radius:6px; transition:width .6s ease; }
+    .tl-price { font-weight:700; font-size:.95rem; min-width:70px; text-align:right; }
+    .tl-rec { font-size:.75rem; font-weight:700; padding:3px 10px; border-radius:20px; flex-shrink:0; }
+    .rec-buy { background:#dcfce7; color:#15803d; }
+    .rec-wait { background:#fef3c7; color:#b45309; }
+    .rec-avoid { background:#fee2e2; color:#b91c1c; }
+
+    .factors { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+    .factor-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.2rem; }
+    .factor-card h4 { font-size:.88rem; font-weight:700; margin-bottom:.8rem; }
+    .factor-item { display:flex; align-items:center; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--border); font-size:.82rem; }
+    .factor-item:last-child { border:none; }
+    .factor-impact { font-weight:700; }
+    .imp-high { color:var(--red); }
+    .imp-med { color:var(--accent); }
+    .imp-low { color:var(--green); }
+
+    @media(max-width:700px) {
+      .predict-form { grid-template-columns:1fr 1fr; }
+      .btn-predict { grid-column:1/-1; }
+      .pred-grid { grid-template-columns:1fr 1fr; }
+      .factors { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+<nav>
+  <div class="nav-logo">Sky<span>AI</span></div>
+  <ul>
+    <li><a href="index.html">Search</a></li>
+    <li><a href="tracker.html">Price Tracker</a></li>
+    <li><a href="predict.html" class="active">AI Predict</a></li>
+  </ul>
+</nav>
+
+<div class="page-header">
+  <h1>🤖 AI Price Prediction</h1>
+  <p>Machine learning analysis of historical data, demand signals, and seasonal patterns to predict the best booking window.</p>
+</div>
+
+<div class="container">
+  <div class="predict-form">
+    <div class="field">
+      <label>From</label>
+      <input type="text" id="pfrom" value="Mumbai (BOM)">
+    </div>
+    <div class="field">
+      <label>To</label>
+      <input type="text" id="pto" value="Delhi (DEL)">
+    </div>
+    <div class="field">
+      <label>Travel Date</label>
+      <input type="date" id="pdate">
+    </div>
+    <button class="btn-predict" onclick="runPrediction()">🤖 Predict</button>
+  </div>
+
+  <div class="prediction-result" id="pred-result">
+    <div class="pred-header">
+      <div>
+        <h3>Mumbai → Delhi · AI Prediction</h3>
+        <div style="font-size:.82rem;opacity:.8;margin-top:4px;">Based on 180 days of historical data + real-time demand signals</div>
+      </div>
+      <div class="pred-confidence">Confidence: 87%</div>
+    </div>
+    <div class="pred-body">
+      <div class="pred-grid">
+        <div class="pred-stat">
+          <div class="label">Current Avg</div>
+          <div class="val">₹4,820</div>
+        </div>
+        <div class="pred-stat">
+          <div class="label">Predicted Low</div>
+          <div class="val" style="color:var(--green)">₹3,450</div>
+        </div>
+        <div class="pred-stat">
+          <div class="label">Best Book Window</div>
+          <div class="val" style="font-size:1rem;margin-top:4px;">Today</div>
+        </div>
+        <div class="pred-stat">
+          <div class="label">Expected Saving</div>
+          <div class="val" style="color:var(--green)">₹1,370</div>
+        </div>
+      </div>
+
+      <h4 style="margin-bottom:1rem;font-size:.95rem;">📅 7-Day Price Forecast</h4>
+      <div class="timeline" id="timeline"></div>
+    </div>
+  </div>
+
+  <div class="factors">
+    <div class="factor-card">
+      <h4>📊 Factors Driving Prices Up</h4>
+      <div class="factor-item"><span>Upcoming public holiday</span><span class="factor-impact imp-high">↑ High</span></div>
+      <div class="factor-item"><span>IPL season demand</span><span class="factor-impact imp-high">↑ High</span></div>
+      <div class="factor-item"><span>Weekend travel surge</span><span class="factor-impact imp-med">↑ Med</span></div>
+      <div class="factor-item"><span>Reduced airline capacity</span><span class="factor-impact imp-med">↑ Med</span></div>
+    </div>
+    <div class="factor-card">
+      <h4>📉 Factors Keeping Prices Low</h4>
+      <div class="factor-item"><span>New IndiGo route added</span><span class="factor-impact imp-low">↓ Low</span></div>
+      <div class="factor-item"><span>Midweek departure</span><span class="factor-impact imp-low">↓ Low</span></div>
+      <div class="factor-item"><span>Off-peak morning slot</span><span class="factor-impact imp-low">↓ Low</span></div>
+      <div class="factor-item"><span>Early booking discount</span><span class="factor-impact imp-low">↓ Low</span></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+const d = new Date(); d.setDate(d.getDate()+7);
+document.getElementById('pdate').value = d.toISOString().split('T')[0];
+
+const days = [
+  { day:'Today', price:3450, rec:'buy' },
+  { day:'Tomorrow', price:3620, rec:'buy' },
+  { day:'In 2 days', price:3890, rec:'wait' },
+  { day:'In 3 days', price:4250, rec:'wait' },
+  { day:'In 4 days', price:4680, rec:'avoid' },
+  { day:'In 5 days', price:5100, rec:'avoid' },
+  { day:'In 6 days', price:5350, rec:'avoid' },
+];
+const maxP = Math.max(...days.map(d=>d.price));
+
+function renderTimeline() {
+  const tl = document.getElementById('timeline');
+  tl.innerHTML = '';
+  days.forEach(item => {
+    const pct = Math.round((item.price/maxP)*100);
+    const color = item.rec==='buy' ? '#22c55e' : item.rec==='wait' ? '#f97316' : '#ef4444';
+    const recLabel = item.rec==='buy' ? 'BUY' : item.rec==='wait' ? 'WAIT' : 'AVOID';
+    const recClass = `rec-${item.rec}`;
+    tl.innerHTML += `<div class="tl-item">
+      <div class="tl-day">${item.day}</div>
+      <div class="tl-bar-wrap"><div class="tl-bar" style="width:${pct}%;background:${color}"></div></div>
+      <div class="tl-price">₹${item.price.toLocaleString()}</div>
+      <span class="tl-rec ${recClass}">${recLabel}</span>
+    </div>`;
+  });
+}
+
+function runPrediction() {
+  document.getElementById('pred-result').style.display='block';
+  renderTimeline();
+  document.getElementById('pred-result').scrollIntoView({behavior:'smooth'});
+}
+
+renderTimeline();
+</script>
+</body>
+</html>
